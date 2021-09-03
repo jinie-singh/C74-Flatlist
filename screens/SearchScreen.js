@@ -1,12 +1,39 @@
 import React from 'react';
-import { Text, View } from 'react-native';
+import { Text, View,ScrollView } from 'react-native';
+import * as firebase from "firebase";
+import db from '../config'
 
 export default class Searchscreen extends React.Component {
+    constructor(props){
+      super(props);
+      this.state = {
+        allTransactions : []
+      }
+    }
+    componentDidMount = async () => {
+      const query = await db.collection("transactions").get();
+      query.docs.map((doc)=>{
+        this.setState({
+          allTransactions : [...this.state.allTransactions,doc.data()]
+        })
+      })
+    }
     render() {
       return (
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-          <Text>Search</Text>
-        </View>
+        <ScrollView>
+          {
+            this.state.allTransactions.map((transaction)=>{
+              return(
+                <View style = {{borderBottomWidth : 2}}>
+                  <Text>{"Book Id : " + transaction.bookId}</Text>
+                  <Text>{"Student Id : " + transaction.studentId}</Text>
+                  <Text>{"Transaction Type : " + transaction.transactionType}</Text>
+                  <Text>{"Date : " + transaction.date.toDate()}</Text>
+                </View>
+              )
+            })
+          }
+        </ScrollView>
       );
     }
   }
